@@ -64,7 +64,7 @@ export const Weather: React.FunctionComponent<{
     return response.data;
   }
 
-  const WeatherIcon = WeatherConditionIcons[data?.weather?.[0]?.main || 'Any']
+  const WeatherIcon = WeatherConditionIcons[data?.weather?.[0]?.main || 'Any'] ||  WeatherConditionIcons.Any
 
   const lastUpdateDate = new Date(dataUpdatedAt)
 
