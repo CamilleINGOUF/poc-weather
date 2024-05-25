@@ -30,6 +30,24 @@ const WeatherConditionIcons: Record<WeatherCondition, any> = {
   'Any': WbSunnyIcon,
 };
 
+const getWeather = async (lat: number, long: number): Promise<WeatherType> => {
+  
+  const response = await axios.get('https://api.openweathermap.org/data/2.5/weather', {
+    params: {
+      lat,
+      lon: long,
+      appid: API_KEY,
+      units: 'metric'
+    }
+  });
+
+  if (response.status > 399) {
+    throw new Error(response.statusText)
+  }
+
+  return response.data;
+}
+
 const API_KEY = "557193f681b8e4c221be7532a74da09c";
 export const Weather: React.FunctionComponent<{
   lat: number;
@@ -45,24 +63,6 @@ export const Weather: React.FunctionComponent<{
     // stale after 2 minutes
     staleTime: 120000,
   })
-
-  const getWeather = async (lat: number, long: number): Promise<WeatherType> => {
-    
-    const response = await axios.get('https://api.openweathermap.org/data/2.5/weather', {
-      params: {
-        lat,
-        lon: long,
-        appid: API_KEY,
-        units: 'metric'
-      }
-    });
-
-    if (response.status > 399) {
-      throw new Error(response.statusText)
-    }
-
-    return response.data;
-  }
 
   const WeatherIcon = WeatherConditionIcons[data?.weather?.[0]?.main || 'Any'] ||  WeatherConditionIcons.Any
 
