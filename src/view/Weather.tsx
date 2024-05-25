@@ -37,11 +37,11 @@ export const Weather: React.FunctionComponent<{
 }> = ({
   lat, long,
 }) => {
-  const { data, isFetching, isStale, error } = useQuery({
+  const { data, error, dataUpdatedAt } = useQuery({
     queryKey: ['weather', lat, long],
     queryFn: () => getWeather(lat, long),
-    // auto-refresh every hour
-    refetchInterval: 600000,
+    // auto-refresh every 3 minutes
+    refetchInterval: 180000,
     // stale after 2 minutes
     staleTime: 120000,
   })
@@ -66,6 +66,8 @@ export const Weather: React.FunctionComponent<{
 
   const WeatherIcon = WeatherConditionIcons[data?.weather?.[0]?.main || 'Any']
 
+  const lastUpdateDate = new Date(dataUpdatedAt)
+
   return (
     <Card sx={{ width: 400 }}>
       {
@@ -80,6 +82,9 @@ export const Weather: React.FunctionComponent<{
         </Typography>
         <Typography>
           Temperature Ressentie: {data?.main?.feels_like}°C
+        </Typography>
+        <Typography>
+          Dernière mise à jour: {lastUpdateDate.toLocaleString('fr-FR', { timeZone: 'Europe/Paris' })}
         </Typography>
       </CardContent>
     </Card>
