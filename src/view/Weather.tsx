@@ -1,80 +1,70 @@
+import { ReactElement } from 'react';
 import axios from 'axios';
 import { useQuery } from "@tanstack/react-query";
-import { Alert, Box, Button, Card, CardActions, CardContent, Typography } from "@mui/material";
+import { Alert, Box, Card, CardActions, CardContent, SvgIcon, Typography } from "@mui/material";
+import CloudIcon from '@mui/icons-material/Cloud';
+import WbSunnyIcon from '@mui/icons-material/WbSunny';
+import ThunderstormIcon from '@mui/icons-material/Thunderstorm';
+import WaterDropRoundedIcon from '@mui/icons-material/WaterDropRounded';
+import OpacityRoundedIcon from '@mui/icons-material/OpacityRounded';
 
-const API_KEY = "c6dea39f86ea31dc114f0a4f0eec8fa9";
+
+type WeatherCondition = 'Clouds' | 'Clear' | 'Rain' | 'Drizzle' | 'Thunderstorm' | 'Any';
+
+type WeatherType = {
+  main: {
+    temp: number,
+    feels_like: number,
+  },
+  weather: Array<{
+    main: WeatherCondition;
+  }>
+}
+
+const WeatherConditionIcons: Record<WeatherCondition, any> = {
+  'Clouds': CloudIcon,
+  'Clear': WbSunnyIcon,
+  'Drizzle': OpacityRoundedIcon,
+  'Rain': WaterDropRoundedIcon,
+  'Thunderstorm': ThunderstormIcon,
+  'Any': WbSunnyIcon,
+};
+
+const API_KEY = "557193f681b8e4c221be7532a74da09c";
 export const Weather: React.FunctionComponent<{
   lat: number;
   long: number;
 }> = ({
   lat, long,
 }) => {
-  const { data, isFetching, isStale, error, refetch } = useQuery({
+  const { data, isFetching, isStale, error } = useQuery({
     queryKey: ['weather', lat, long],
     queryFn: () => getWeather(lat, long),
     // auto-refresh every hour
     refetchInterval: 600000,
+    // stale after 2 minutes
     staleTime: 120000,
   })
 
-  const getWeather = async (lat: number, long: number) => {
+  const getWeather = async (lat: number, long: number): Promise<WeatherType> => {
     
-    // return await axios.get('https://api.openweathermap.org/data/2.5/weather', {
-    //   params: {
-    //     lat,
-    //     long,
-    //     appid: API_KEY,
-    //     units: 'metric'
-    //   }
-    // });
-
-    let response = await axios.get('https://jsonplaceholder.typicode.com/todos/1')
-
-    if (Math.random() > .8) {
-      response = {
-        status: 400,
-        data: 'Missing data'
-      } as any
-    }
+    const response = await axios.get('https://api.openweathermap.org/data/2.5/weather', {
+      params: {
+        lat,
+        lon: long,
+        appid: API_KEY,
+        units: 'metric'
+      }
+    });
 
     if (response.status > 399) {
-      throw new Error(response.data);
+      throw new Error(response.statusText)
     }
 
-    return {
-      "lat": 33.44,
-      "lon": -94.04,
-      "timezone": "America/Chicago",
-      "timezone_offset": -21600,
-      "current": {
-        "dt": 1618317040,
-        "sunrise": 1618282134,
-        "sunset": 1618333901,
-        "temp": 284.07,
-        "feels_like": 282.84,
-        "pressure": 1019,
-        "humidity": 62,
-        "dew_point": 277.08,
-        "uvi": 0.89,
-        "clouds": 0,
-        "visibility": 10000,
-        "wind_speed": 6,
-        "wind_deg": 300,
-        "weather": [
-          {
-            "id": 500,
-            "main": "Rain",
-            "description": "light rain",
-            "icon": "10d"
-          }
-        ],
-        "rain": {
-          "1h": 0.21
-        }
-      },
-    };
+    return response.data;
   }
 
+  const WeatherIcon = WeatherConditionIcons[data?.weather?.[0]?.main || 'Any']
 
   return (
     <Card sx={{ width: 400 }}>
@@ -84,25 +74,14 @@ export const Weather: React.FunctionComponent<{
         )
       }
       <CardContent>
+        <WeatherIcon />
         <Typography>
-          Temperature: {data?.current.temp} degrés celcius
+          Temperature Réelle: {data?.main?.temp}°C
         </Typography>
         <Typography>
-          Ressentie: {data?.current.feels_like} degrés celcius
+          Temperature Ressentie: {data?.main?.feels_like}°C
         </Typography>
       </CardContent>
-      <CardActions sx={{ padding: 0, display: "flex", justifyContent: 'space-evenly' }}>
-        <Box
-          sx={{ width: '50%', backgroundColor: isFetching ? 'lightblue' : 'grey' }}
-        >
-          <Typography variant="caption">{isFetching ? 'Fetching' : 'Not Fetching'}</Typography>
-        </Box>
-        <Box
-          sx={{ width: '50%', backgroundColor: isStale ? 'orange' : 'lightgreen' }}
-        >
-          <Typography variant="caption">{isStale ? 'Stale' : 'Fresh'}</Typography>
-        </Box>
-      </CardActions>
     </Card>
   );
 };
