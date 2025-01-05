@@ -82,6 +82,7 @@ export const Weather: React.FunctionComponent<{
         <Typography>
           Temperature Réelle: {data?.main?.temp}°C
         </Typography>
+        test 4
         <Typography>
           Temperature Ressentie: {data?.main?.feels_like}°C
         </Typography>
