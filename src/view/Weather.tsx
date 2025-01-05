@@ -86,6 +86,7 @@ export const Weather: React.FunctionComponent<{
         <Typography>
           Dernière mise à jour: {lastUpdateDate.toLocaleString('fr-FR', { timeZone: 'Europe/Paris' })}
         </Typography>
+        test
       </CardContent>
     </Card>
   );
