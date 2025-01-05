@@ -76,6 +76,7 @@ export const Weather: React.FunctionComponent<{
         )
       }
       <CardContent>
+        test 2
         <WeatherIcon />
         <Typography>
           Temperature Réelle: {data?.main?.temp}°C
